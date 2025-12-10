@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Copy of Nomada Guest Experience",
+  "description": "A luxury tablet dashboard for hotel guests featuring immersive backgrounds, intuitive navigation, and real-time services.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

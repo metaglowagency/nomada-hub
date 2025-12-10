@@ -1,0 +1,8 @@
+/*
+FOLDER INSTRUCTIONS:
+--------------------
+1. Place your "logo.png" file in this folder.
+2. You can also place other static images here.
+
+This folder keeps your main project directory clean.
+*/

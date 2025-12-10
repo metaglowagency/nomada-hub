@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nomada Guest Experience</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              serif: ['"Playfair Display"', 'serif'],
+              sans: ['"Lato"', 'sans-serif'],
+            },
+            colors: {
+              gold: {
+                300: '#F3E5AB', // Champagne
+                400: '#C5A059', // Antique Gold
+                500: '#997B36', // Bronze
+              },
+              brand: {
+                dark: '#000000', // Pure Black
+                glass: 'rgba(0, 0, 0, 0.75)', // Premium Smoked Glass
+              }
+            },
+            animation: {
+              'slow-zoom': 'ken-burns 45s ease-in-out infinite alternate',
+              'fade-in-up': 'fade-in-up 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+              'fade-in': 'fade-in 1s ease-out forwards',
+            },
+            keyframes: {
+              'ken-burns': {
+                '0%': { transform: 'scale(1) translate(0, 0)' },
+                '100%': { transform: 'scale(1.15) translate(-2%, -2%)' },
+              },
+              'fade-in-up': {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              'fade-in': {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Hide scrollbar for kiosk feel */
+      ::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+      }
+      body {
+        cursor: pointer; /* Simulate touch readiness */
+      }
+      
+      /* Glass Panel - Adaptive */
+      .glass-panel {
+        /* Light Mode: Frosted White */
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+      }
+      
+      .dark .glass-panel {
+        /* Dark Mode: Premium Smoked Black */
+        background: rgba(0, 0, 0, 0.75); 
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      }
+
+      /* Custom Scrollbar for inner content */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(197, 160, 89, 0.5); /* Gold */
+        border-radius: 4px;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0"
+  }
+}
+</script>
+</head>
+  <body class="bg-gray-100 dark:bg-black text-gray-900 dark:text-white overflow-hidden select-none transition-colors duration-500">
+    <div id="root"></div>
+  </body>
+</html>
