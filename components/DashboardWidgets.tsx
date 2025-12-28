@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Music, Sun, Moon, Coffee, Utensils, Sparkles, Clock, CheckCircle } from 'lucide-react';
+import { useSystem } from '../context/SystemContext';
+import { Play, Pause, Music, Sun, Moon, Coffee, Utensils, Sparkles, Clock, CheckCircle, Car, Ticket } from 'lucide-react';
 
 // --- MOOD PLAYER WIDGET ---
 const MOOD_TRACKS = [
@@ -18,7 +19,6 @@ export const MoodPlayer: React.FC = () => {
 
     const toggleMood = (moodId: string) => {
         if (activeMood === moodId) {
-            // Toggle play/pause
             if (isPlaying) {
                 audioRef.current?.pause();
                 setIsPlaying(false);
@@ -27,10 +27,8 @@ export const MoodPlayer: React.FC = () => {
                 setIsPlaying(true);
             }
         } else {
-            // Change track
             setActiveMood(moodId);
             setIsPlaying(true);
-            // In a real app, we'd handle source changing more gracefully
             setTimeout(() => audioRef.current?.play(), 100);
         }
     };
@@ -55,7 +53,7 @@ export const MoodPlayer: React.FC = () => {
                  )}
             </div>
 
-            <div className="space-y-3 z-10">
+            <div className="space-y-2 z-10">
                 {MOOD_TRACKS.map(track => (
                     <button
                         key={track.id}
@@ -75,7 +73,6 @@ export const MoodPlayer: React.FC = () => {
                 ))}
             </div>
 
-            {/* Background Glow */}
             {activeMood && isPlaying && (
                  <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-gold-400/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
             )}
@@ -85,36 +82,47 @@ export const MoodPlayer: React.FC = () => {
 
 // --- DAILY AGENDA WIDGET ---
 export const DailyAgenda: React.FC<{ guestName: string }> = ({ guestName }) => {
-    // Mock Data - In real app, comes from Booking Context + Orders
-    const events = [
-        { time: '08:00', title: 'Breakfast Served', loc: 'Atlas Room', icon: Coffee, status: 'past' },
-        { time: '11:00', title: 'Housekeeping', loc: 'Room 304', icon: Sparkles, status: 'active' },
-        { time: '19:30', title: 'Dinner Reservation', loc: 'Rooftop', icon: Utensils, status: 'future' },
+    const { guestRequests, deviceRoomNumber } = useSystem();
+    
+    // Map requests to agenda items
+    const requestItems = guestRequests
+        .filter(r => r.roomNumber === deviceRoomNumber && r.status === 'CONFIRMED')
+        .map(r => ({
+            time: new Date(r.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            title: r.title,
+            loc: r.type === 'TRANSPORT' ? 'Entrance' : 'Partner Loc',
+            icon: r.type === 'TRANSPORT' ? Car : Ticket,
+            status: 'active'
+        }));
+
+    // Static Mock items for visual depth
+    const staticEvents = [
+        { time: '11:00', title: 'Room Refresh', loc: 'In-Suite', icon: Sparkles, status: 'past' },
     ];
+
+    const allEvents = [...staticEvents, ...requestItems].sort((a,b) => a.time.localeCompare(b.time));
 
     return (
         <div className="glass-panel p-6 rounded-3xl h-full flex flex-col">
             <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center space-x-2 text-gold-400">
                     <Clock size={14} />
-                    <span className="text-[10px] uppercase tracking-[0.25em] font-bold">My Itinerary</span>
+                    <span className="text-[10px] uppercase tracking-[0.25em] font-bold">Today's Journey</span>
                 </div>
-                <span className="text-[9px] text-gray-500 uppercase tracking-wider">{new Date().toLocaleDateString('en-US', {weekday: 'short'})}</span>
+                <span className="text-[9px] text-gray-500 uppercase tracking-widest">{new Date().toLocaleDateString('en-US', {weekday: 'short'})}</span>
             </div>
 
-            <div className="flex-1 space-y-0 relative">
-                {/* Vertical Line */}
+            <div className="flex-1 space-y-0 relative overflow-y-auto custom-scrollbar">
                 <div className="absolute left-3 top-2 bottom-2 w-[1px] bg-white/10" />
 
-                {events.map((evt, idx) => (
-                    <div key={idx} className={`relative pl-10 py-3 group ${evt.status === 'past' ? 'opacity-40' : 'opacity-100'}`}>
-                        {/* Dot */}
+                {allEvents.map((evt, idx) => (
+                    <div key={idx} className={`relative pl-10 py-3 group ${evt.status === 'past' ? 'opacity-30' : 'opacity-100'}`}>
                         <div className={`absolute left-[9px] top-4 w-1.5 h-1.5 rounded-full border border-black ${evt.status === 'active' ? 'bg-gold-400 scale-125 shadow-[0_0_10px_rgba(197,160,89,1)]' : 'bg-gray-600'}`} />
                         
                         <div className="flex justify-between items-start">
                              <div>
                                  <span className="text-[10px] font-mono text-gold-400 block mb-0.5">{evt.time}</span>
-                                 <h4 className="text-sm font-bold text-white">{evt.title}</h4>
+                                 <h4 className="text-sm font-bold text-white leading-tight">{evt.title}</h4>
                                  <p className="text-[10px] text-gray-400">{evt.loc}</p>
                              </div>
                              <div className="p-2 rounded-full bg-white/5 text-gray-400 group-hover:bg-white/10 group-hover:text-white transition-colors">
@@ -123,10 +131,16 @@ export const DailyAgenda: React.FC<{ guestName: string }> = ({ guestName }) => {
                         </div>
                     </div>
                 ))}
+                
+                {allEvents.length === 0 && (
+                    <div className="py-12 text-center">
+                        <p className="text-xs text-gray-500 font-serif italic">Your itinerary is open.</p>
+                    </div>
+                )}
             </div>
 
             <div className="mt-4 pt-4 border-t border-white/5 text-center">
-                 <button className="text-[10px] uppercase font-bold text-gray-500 hover:text-white transition-colors">View Full Calendar</button>
+                 <button className="text-[9px] uppercase font-bold text-gray-500 hover:text-gold-400 transition-colors tracking-widest">Discover Experiences</button>
             </div>
         </div>
     );

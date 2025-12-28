@@ -1,19 +1,18 @@
 
 import React, { useState } from 'react';
 import { useSystem } from '../context/SystemContext';
-import { CreditCard, LogOut, HelpCircle, Wifi, Phone, Clock, FileText, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
+import { CreditCard, LogOut, HelpCircle, Wifi, Phone, Clock, FileText, ChevronDown, ChevronUp, MessageCircle, Key, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 
 const Reception: React.FC = () => {
   const { orders, bookings, rooms } = useSystem();
+  const [showKey, setShowKey] = useState(false);
   
-  // Get current guest info
-  // In a real app, we'd use auth context. Here we grab the first booking or the "Isabella" booking
   const currentBooking = bookings.find(b => b.roomNumber === '304') || bookings[0];
   const roomOrders = orders.filter(o => o.roomNumber === '304');
   
   const roomTotal = currentBooking ? currentBooking.totalAmount : 0;
   const diningTotal = roomOrders.reduce((acc, curr) => acc + curr.total, 0);
-  const taxes = (roomTotal + diningTotal) * 0.10; // 10% tax mock
+  const taxes = (roomTotal + diningTotal) * 0.10;
   const grandTotal = roomTotal + diningTotal + taxes;
 
   const [checkoutRequested, setCheckoutRequested] = useState(false);
@@ -31,16 +30,38 @@ const Reception: React.FC = () => {
           </span>
           <h2 className="text-4xl md:text-5xl font-serif text-gray-900 dark:text-white transition-colors duration-500">Support & Billing</h2>
         </div>
-        <div className="text-right hidden md:block">
-           <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-widest mb-1">Apartment ID</p>
-           <p className="text-3xl font-serif text-gray-900 dark:text-white">Unit 304</p>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1 min-h-0 overflow-y-auto custom-scrollbar pr-2">
          
-         {/* LEFT COL: BILLING & CHECKOUT */}
+         {/* LEFT COL: ACCESS & BILLING */}
          <div className="flex flex-col gap-6">
+            
+            {/* DIGITAL SUITE KEY - NOW IN RECEPTION */}
+            <div className="glass-panel p-8 rounded-3xl border-l-4 border-l-gold-400 bg-gradient-to-br from-white/5 to-transparent">
+                <div className="flex justify-between items-start mb-6">
+                    <div>
+                        <span className="text-[10px] text-gold-400 uppercase tracking-[0.3em] font-bold block mb-1">Access Control</span>
+                        <h3 className="text-xl font-serif text-white">Digital Suite Key</h3>
+                    </div>
+                    <ShieldCheck size={24} className="text-green-500" />
+                </div>
+                
+                <div className="flex items-center justify-center py-6">
+                    <div 
+                        onClick={() => setShowKey(!showKey)}
+                        className="flex items-center space-x-6 px-10 py-5 bg-black/40 rounded-2xl border border-white/10 cursor-pointer hover:border-gold-400 transition-all active:scale-95 group shadow-2xl"
+                    >
+                        <Key size={28} className={showKey ? 'text-gold-400' : 'text-gray-600'} />
+                        <span className={`text-4xl font-mono tracking-[0.5em] font-bold ${showKey ? 'text-white' : 'text-gray-700 blur-sm transition-all duration-300'}`}>
+                            {currentBooking?.doorCode || '8821'}
+                        </span>
+                        {showKey ? <EyeOff size={20} className="text-gray-500" /> : <Eye size={20} className="text-gray-500" />}
+                    </div>
+                </div>
+                <p className="text-center text-[10px] text-gray-500 uppercase tracking-widest mt-2">Tap to reveal code for Unit {currentBooking?.roomNumber || '304'}</p>
+            </div>
+
             <div className="glass-panel p-8 rounded-3xl">
                 <div className="flex items-center space-x-3 mb-6 text-gold-400">
                     <CreditCard size={24} />
@@ -65,11 +86,6 @@ const Reception: React.FC = () => {
                         <span className="text-gray-900 dark:text-white font-mono">${diningTotal.toFixed(2)}</span>
                     </div>
 
-                    <div className="flex justify-between items-center py-3 border-b border-dashed border-gray-300 dark:border-white/10">
-                        <span className="text-sm font-bold text-gray-700 dark:text-gray-200">City Tax (10%)</span>
-                        <span className="text-gray-900 dark:text-white font-mono">${taxes.toFixed(2)}</span>
-                    </div>
-
                     <div className="flex justify-between items-center pt-4">
                         <span className="text-lg font-serif text-gray-900 dark:text-white">Total Due</span>
                         <span className="text-3xl font-serif text-gold-400">${grandTotal.toFixed(2)}</span>
@@ -80,7 +96,7 @@ const Reception: React.FC = () => {
                 {checkoutRequested ? (
                     <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-6 text-center animate-fade-in-up">
                         <h4 className="text-green-500 font-bold uppercase tracking-widest text-sm mb-2">Checkout Initiated</h4>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm">You may leave the keys on the table. The door will auto-lock upon departure.</p>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm">The door will auto-lock upon departure.</p>
                     </div>
                 ) : (
                     <button 
@@ -92,26 +108,6 @@ const Reception: React.FC = () => {
                     </button>
                 )}
             </div>
-
-            {/* Quick Info Cards */}
-            <div className="grid grid-cols-2 gap-4">
-                <div className="glass-panel p-6 rounded-2xl flex flex-col items-center text-center">
-                    <div className="w-10 h-10 rounded-full bg-gold-400/20 text-gold-400 flex items-center justify-center mb-3">
-                        <Wifi size={20} />
-                    </div>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">WiFi Network</span>
-                    <span className="font-bold text-gray-900 dark:text-white">Nomada_Guest</span>
-                    <span className="text-xs text-gray-500 mt-2">Pass: luxury2024</span>
-                </div>
-                <div className="glass-panel p-6 rounded-2xl flex flex-col items-center text-center cursor-pointer hover:bg-white/5 transition-colors">
-                    <div className="w-10 h-10 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center mb-3">
-                        <MessageCircle size={20} />
-                    </div>
-                    <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Digital Host</span>
-                    <span className="font-bold text-gray-900 dark:text-white">WhatsApp Us</span>
-                    <span className="text-xs text-gray-500 mt-2">24/7 Response</span>
-                </div>
-            </div>
          </div>
 
          {/* RIGHT COL: INFO & FAQ */}
@@ -122,45 +118,34 @@ const Reception: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-                <FaqItem 
-                    id="gym" 
-                    title="Fitness & Wellness" 
-                    active={activeFaq === 'gym'} 
-                    toggle={() => toggleFaq('gym')}
-                    icon={Wifi} 
-                >
+                <FaqItem id="gym" title="Fitness & Wellness" active={activeFaq === 'gym'} toggle={() => toggleFaq('gym')} icon={Wifi}>
                     As a Nomada guest, you have exclusive access to our partner gyms and spas across the city. Purchase day passes in the <strong>Concierge</strong> tab to receive your digital entry code.
                 </FaqItem>
 
-                <FaqItem 
-                    id="reception" 
-                    title="Where is the Reception?" 
-                    active={activeFaq === 'reception'} 
-                    toggle={() => toggleFaq('reception')}
-                    icon={Clock}
-                >
+                <FaqItem id="reception" title="Where is the Reception?" active={activeFaq === 'reception'} toggle={() => toggleFaq('reception')} icon={Clock}>
                     Nomada Apartments are fully autonomous with no physical front desk. Our support team is available 24/7 via the Chat tab or WhatsApp for any needs.
                 </FaqItem>
 
-                <FaqItem 
-                    id="house" 
-                    title="Cleaning Services" 
-                    active={activeFaq === 'house'} 
-                    toggle={() => toggleFaq('house')}
-                    icon={FileText}
-                >
+                <FaqItem id="house" title="Cleaning Services" active={activeFaq === 'house'} toggle={() => toggleFaq('house')} icon={FileText}>
                     We respect your privacy and do not enter for daily cleaning. You can book on-demand housekeeping services (fresh linens, full clean) via the <strong>Cleaning</strong> tab.
                 </FaqItem>
 
-                <FaqItem 
-                    id="luggage" 
-                    title="Luggage Storage" 
-                    active={activeFaq === 'luggage'} 
-                    toggle={() => toggleFaq('luggage')}
-                    icon={FileText}
-                >
-                    We partner with secure lockers throughout the city for luggage storage before check-in or after check-out. Contact support for the nearest location code.
+                <FaqItem id="luggage" title="Luggage Storage" active={activeFaq === 'luggage'} toggle={() => toggleFaq('luggage')} icon={FileText}>
+                    We partner with secure lockers throughout the city for luggage storage. Contact support for the nearest location code.
                 </FaqItem>
+            </div>
+
+            <div className="mt-12 grid grid-cols-2 gap-4">
+                <div className="bg-white/5 p-4 rounded-xl text-center border border-white/5">
+                    <Wifi size={18} className="mx-auto mb-2 text-gold-400" />
+                    <span className="block text-[10px] uppercase text-gray-500">Nomada_Guest</span>
+                    <span className="text-xs font-bold text-white">luxury2024</span>
+                </div>
+                <div className="bg-white/5 p-4 rounded-xl text-center border border-white/5">
+                    <MessageCircle size={18} className="mx-auto mb-2 text-green-500" />
+                    <span className="block text-[10px] uppercase text-gray-500">24/7 Support</span>
+                    <span className="text-xs font-bold text-white">WhatsApp Host</span>
+                </div>
             </div>
          </div>
 

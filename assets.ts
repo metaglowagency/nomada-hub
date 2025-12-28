@@ -1,18 +1,12 @@
 
 // This file serves as your "Public Folder" manager.
-// To use your own images:
-// 1. Place your image files in the same directory as index.html (or a dedicated /images folder).
-// 2. Update the paths below. Example: logo: './my-hotel-logo.png'
-
 export const ASSETS = {
   BRANDING: {
     // -------------------------------------------------------------------------
     // LOGO CONFIGURATION
     // -------------------------------------------------------------------------
-    // If you do not have a logo.png file, the app will gracefully fall back 
-    // to the sophisticated SVG "Nomada" logo defined in Sidebar.tsx.
-    // To test an image logo, you can use a URL here.
-    LOGO: '', 
+    // Updated to absolute path to ensure it resolves to the public directory.
+    LOGO: '/logo.png', 
   },
   BACKGROUNDS: [
     'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?q=80&w=1600&auto=format&fit=crop', // Iconic Morocco Arch

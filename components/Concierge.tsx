@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, Sparkles, Send, Wifi, Coffee, Clock3, Utensils, Gift, Calendar, Users, CheckCircle, MapPin, ChevronRight, Star, Dumbbell, Ticket } from 'lucide-react';
+import { MessageSquare, Sparkles, Send, Wifi, Coffee, Clock3, Utensils, Gift, Calendar, Users, CheckCircle, MapPin, ChevronRight, Star, Dumbbell, Ticket, Car } from 'lucide-react';
 import { useSystem } from '../context/SystemContext';
 
-type ConciergeTab = 'CHAT' | 'DINING' | 'PASSES' | 'AMENITIES';
+type ConciergeTab = 'CHAT' | 'PARTNERS' | 'DINING' | 'PASSES' | 'AMENITIES';
 
 const Concierge: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ConciergeTab>('CHAT');
@@ -30,6 +30,12 @@ const Concierge: React.FC = () => {
                 label="Live Chat" 
             />
             <NavButton 
+                active={activeTab === 'PARTNERS'} 
+                onClick={() => setActiveTab('PARTNERS')} 
+                icon={Sparkles} 
+                label="Partner Perks" 
+            />
+            <NavButton 
                 active={activeTab === 'DINING'} 
                 onClick={() => setActiveTab('DINING')} 
                 icon={Utensils} 
@@ -39,7 +45,7 @@ const Concierge: React.FC = () => {
                 active={activeTab === 'PASSES'} 
                 onClick={() => setActiveTab('PASSES')} 
                 icon={Ticket} 
-                label="Gym & Spa Passes" 
+                label="Gym & Spa" 
             />
             <NavButton 
                 active={activeTab === 'AMENITIES'} 
@@ -52,6 +58,7 @@ const Concierge: React.FC = () => {
         {/* Main Content Area */}
         <div className="flex-1 glass-panel rounded-3xl overflow-hidden relative border border-white/10 dark:border-white/5 bg-white/50 dark:bg-black/40">
             {activeTab === 'CHAT' && <ChatInterface />}
+            {activeTab === 'PARTNERS' && <PartnerHubInterface />}
             {activeTab === 'DINING' && <DiningInterface />}
             {activeTab === 'PASSES' && <PassesInterface />}
             {activeTab === 'AMENITIES' && <AmenitiesInterface />}
@@ -78,6 +85,40 @@ const NavButton: React.FC<{ active: boolean; onClick: () => void; icon: any; lab
     </button>
 );
 
+// New: Partner Hub View moved from Dashboard
+const PartnerHubInterface: React.FC = () => (
+    <div className="p-8 flex flex-col h-full animate-fade-in">
+        <h3 className="text-2xl font-serif text-white mb-6">Distributed Perks</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <PartnerHubTile icon={Car} name="Range Rover Rental" dist="In-Suite" status="Ready to book" tag="Premium Transport" />
+             <PartnerHubTile icon={Coffee} name="Cafe Hafa" dist="1.2 km" status="Complimentary Tea" tag="Local Perk" />
+             <PartnerHubTile icon={Dumbbell} name="City Club Fitness" dist="0.4 km" status="Open until 10PM" tag="Gym Partner" />
+             <PartnerHubTile icon={Star} name="Kasbah Tour" dist="0.1 km" status="Priority Booking" tag="Experience" />
+        </div>
+        <div className="mt-auto pt-8 border-t border-white/10 text-center">
+            <p className="text-xs text-gray-500 italic max-w-md mx-auto">Nomada operates as a distributed hotel. We partner with the city's finest establishments to provide you with a world-class stay.</p>
+        </div>
+    </div>
+);
+
+const PartnerHubTile: React.FC<{ icon: any, name: string, dist: string, status: string, tag: string }> = ({ icon: Icon, name, dist, status, tag }) => (
+    <div className="glass-panel p-5 rounded-2xl border-l-2 border-l-gold-400 flex items-center justify-between group cursor-pointer hover:bg-white/10 transition-all">
+        <div className="flex items-center space-x-4">
+            <div className="p-3 rounded-xl bg-gold-400/10 text-gold-400 group-hover:bg-gold-400 group-hover:text-black transition-all">
+                <Icon size={20} />
+            </div>
+            <div>
+                <span className="text-[8px] uppercase font-bold tracking-[0.2em] text-gray-500 mb-0.5 block">{tag}</span>
+                <h4 className="text-sm font-bold text-white transition-colors">{name}</h4>
+                <p className="text-[10px] text-gray-500">{status}</p>
+            </div>
+        </div>
+        <div className="text-right">
+            <span className="text-xs font-mono text-gray-400">{dist}</span>
+        </div>
+    </div>
+);
+
 // 1. Chat Interface
 const ChatInterface: React.FC = () => {
     const [messages, setMessages] = useState([
@@ -91,7 +132,6 @@ const ChatInterface: React.FC = () => {
         setMessages(prev => [...prev, { id: Date.now(), sender: 'guest', text: text, time: 'Now' }]);
         setInput('');
         
-        // Auto-reply simulation
         setTimeout(() => {
             let reply = 'Thank you. I have notified the team and will get back to you shortly.';
             if (text.toLowerCase().includes('wifi')) reply = 'The network is "Nomada_Guest" and the password is "luxury2024".';
@@ -115,7 +155,7 @@ const ChatInterface: React.FC = () => {
     );
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full animate-fade-in">
             <div className="p-4 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-white/40 dark:bg-black/20">
                 <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
@@ -135,7 +175,6 @@ const ChatInterface: React.FC = () => {
                 <div ref={endRef} />
             </div>
 
-            {/* Smart Chips Area */}
             <div className="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
                 <QuickAction icon={Wifi} label="Wifi Password" query="What is the Wifi password?" />
                 <QuickAction icon={Clock3} label="Late Checkout" query="Is late checkout available?" />
@@ -164,7 +203,7 @@ const ChatInterface: React.FC = () => {
     );
 };
 
-// 2. City Dining Interface (New)
+// 2. City Dining Interface
 const DiningInterface: React.FC = () => {
     const { addGuestRequest } = useSystem();
     const [selectedRestaurant, setSelectedRestaurant] = useState<string | null>(null);
@@ -220,7 +259,7 @@ const DiningInterface: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex flex-col h-full overflow-hidden animate-fade-in">
             <div className="p-8 pb-4 shrink-0">
                 <h3 className="text-2xl font-serif text-gray-900 dark:text-white mb-2">City Dining Guide</h3>
                 <p className="text-gray-500 dark:text-gray-400 text-sm">Our concierge's top recommendations for Tangier. We handle the reservation.</p>
@@ -289,16 +328,16 @@ const DiningInterface: React.FC = () => {
     );
 };
 
-// 3. Amenities Interface (New)
+// 3. Amenities Interface
 const AmenitiesInterface: React.FC = () => {
     const { addGuestRequest } = useSystem();
     const [requestedItems, setRequestedItems] = useState<Set<string>>(new Set());
 
     const AMENITIES = [
         { id: 'towel', label: 'Extra Towels', icon: Sparkles },
-        { id: 'water', label: 'Bottled Water', icon: Coffee }, // Using coffee as generic drink icon
+        { id: 'water', label: 'Bottled Water', icon: Coffee },
         { id: 'pillow', label: 'Firm Pillows', icon: Gift },
-        { id: 'adapter', label: 'Power Adapter', icon: Wifi }, // Using wifi/tech icon
+        { id: 'adapter', label: 'Power Adapter', icon: Wifi },
         { id: 'ice', label: 'Ice Bucket', icon: Sparkles },
         { id: 'toiletries', label: 'Toiletries Kit', icon: Gift },
     ];
@@ -318,7 +357,7 @@ const AmenitiesInterface: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-full p-8">
+        <div className="flex flex-col h-full p-8 animate-fade-in">
             <h3 className="text-2xl font-serif text-gray-900 dark:text-white mb-2">House Comforts</h3>
             <p className="text-gray-500 dark:text-gray-400 text-sm mb-8">One-tap requests delivered to your room in minutes.</p>
 
@@ -354,7 +393,7 @@ const AmenitiesInterface: React.FC = () => {
     );
 };
 
-// 4. Passes Interface (Gym & Spa)
+// 4. Passes Interface
 const PassesInterface: React.FC = () => {
     const { addGuestRequest } = useSystem();
     const [justClicked, setJustClicked] = useState<string | null>(null);
@@ -366,7 +405,7 @@ const PassesInterface: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col h-full relative">
+        <div className="flex flex-col h-full relative animate-fade-in">
              <div className="absolute inset-0">
                 <img src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=2000&auto=format&fit=crop" className="w-full h-full object-cover opacity-20" />
                 <div className="absolute inset-0 bg-gradient-to-r from-gray-100 via-gray-100/90 to-transparent dark:from-black dark:via-black/90 dark:to-transparent" />
@@ -374,7 +413,7 @@ const PassesInterface: React.FC = () => {
 
              <div className="relative z-10 p-8 h-full overflow-y-auto custom-scrollbar">
                 <h3 className="text-3xl font-serif text-gray-900 dark:text-white mb-2">Partner Wellness Access</h3>
-                <p className="text-gray-500 dark:text-gray-400 max-w-md mb-8">Purchase digital day passes to the city's finest gyms and spas. We send the entry code directly to your phone.</p>
+                <p className="text-gray-500 dark:text-gray-400 max-w-md mb-8">Purchase digital day passes to the city's finest gyms and spas.</p>
 
                 <div className="grid grid-cols-1 gap-4 max-w-2xl">
                     <PassCard 
@@ -394,15 +433,6 @@ const PassesInterface: React.FC = () => {
                         icon={Sparkles}
                         onClick={() => handleRequestPass("Hammam Al-Andalus")}
                         isClicked={justClicked === "Hammam Al-Andalus"}
-                    />
-                    <PassCard 
-                        title="Mobile Massage" 
-                        type="In-Room Service" 
-                        price="$80" 
-                        desc="Certified therapist comes to your apartment. Includes table and oils."
-                        icon={Clock3}
-                        onClick={() => handleRequestPass("Mobile Massage")}
-                        isClicked={justClicked === "Mobile Massage"}
                     />
                 </div>
              </div>
